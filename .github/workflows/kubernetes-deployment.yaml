@@ -1,0 +1,85 @@
+name: 🚀 Deploy
+
+on:
+  workflow_call:
+    inputs:
+      registry_url:
+        description: "Registry where the image is stored (e.g. registry-1.docker.io)"
+        required: false
+        type: string
+        default: "registry-1.docker.io"
+      registry_username:
+        description: "Registry username"
+        required: true
+        type: string
+      environment:
+        description: "Environment to deploy (e.g. staging, production)"
+        required: true
+        type: string
+      namespace_name:
+        description: "Namespace to deploy (e.g. my-namespace, default)"
+        required: true
+        type: string
+      deployment_name:
+        description: "Deployment to deploy (e.g. my-deployment)"
+        required: true
+        type: string
+      image_name:
+        description: "Image to deploy (e.g. my-image)"
+        required: true
+        type: string
+      image_tag:
+        description: "Tag to deploy (e.g. latest, 1.0.0)"
+        required: false
+        default: latest
+        type: string
+    secrets:
+      kubeconfig:
+        description: "Kubeconfig to use, base64 encoded"
+        required: true
+
+jobs:
+  deploy:
+    name: Version [${{ inputs.image_tag }}] on [${{ inputs.environment }}]
+    runs-on: ubuntu-latest
+
+    concurrency: ${{ inputs.environment }} # refer to https://docs.github.com/en/actions/using-jobs/using-concurrency
+    environment:
+      name: ${{ inputs.environment }} # refer to your GitHub repository environment
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Set up kubectl
+        uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ secrets.kubeconfig }}
+
+      - name: 🔊 Display deployment state before update
+        run: kubectl get deployments -n ${{ inputs.namespace_name }} ${{ inputs.deployment_name }} -o=wide
+
+      - name: 🚀 Set image tag to [${{ inputs.image_tag }}]
+        id: set_image
+        run: |
+          echo image_updated=$(kubectl set image -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} ${{ inputs.deployment_name }}=${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ inputs.image_name }}:${{ inputs.image_tag }}) >> $GITHUB_OUTPUT
+
+      - name: 🔊 Display "set_image" step output
+        if: steps.set_image.outputs.image_updated != '' # if the image hasn't been updated, the output will be empty
+        run: echo ${{ steps.set_image.outputs.image_updated }}
+
+      # Rollout the deployment only if the image hasn't been updated, to avoid unnecessary restarts and to pull the new image.
+      - name: 🚀 Rollout deployment [${{ inputs.deployment_name }}]
+        id: rollout
+        if: steps.set_image.outputs.image_updated == '' # if the image hasn't been updated, the output will be empty
+        run: echo deployment_rollout=$(kubectl rollout -n ${{ inputs.namespace_name }} restart deployment ${{ inputs.deployment_name }}) >> $GITHUB_OUTPUT
+
+      - name: 🔊 Display "rollout" step output
+        if: steps.rollout.outputs.deployment_rollout
+        run: echo ${{ steps.rollout.outputs.deployment_rollout }}
+
+      - name: 🔄 Rollout status
+        run: kubectl rollout status -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} --timeout=120s
+
+      - name: 🔊 Display deployment state after update
+        run: kubectl get deployments -n ${{ inputs.namespace_name }} ${{ inputs.deployment_name }} -o=wide

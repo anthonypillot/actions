@@ -1,0 +1,25 @@
+name: 📄 Extract version
+
+on:
+  workflow_call:
+    outputs:
+      result:
+        description: Extract version name from git reference, sanitize and slugify it. If the branch name is the default branch name, replace it with 'latest'. If the head reference is not available, use the git reference as branch name, for instance, the tag.
+        value: ${{ jobs.extract-version.outputs.result }}
+
+permissions:
+  contents: read
+
+jobs:
+  extract-version:
+    name: Extract version
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📄 Extract version
+        id: extract-version
+        uses: anthonypillot/actions/.github/actions/extract-version@v1
+
+    outputs:
+      result: ${{ steps.extract-version.outputs.result }}
