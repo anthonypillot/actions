@@ -3,11 +3,6 @@ name: 🐳 Build and push
 on:
   workflow_call:
     inputs:
-      node_version:
-        description: "Node.js version to use"
-        required: false
-        type: string
-        default: "20.x"
       registry_url:
         description: "Registry to push the image to"
         required: false
