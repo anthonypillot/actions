@@ -9,6 +9,14 @@ Storage of all GitHub Actions, like reusable workflow and composite action ; con
 
 </div>
 
+# Update tag on latest commit
+
+To update the `v1` tag to the latest commit, use the following command:
+
+```bash
+git tag -d v1 && git tag v1 && git push origin --force --tags
+```
+
 # Features
 
 ## Composite actions
