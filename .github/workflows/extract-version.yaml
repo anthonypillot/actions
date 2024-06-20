@@ -4,7 +4,7 @@ on:
   workflow_call:
     outputs:
       result:
-        description: Extract version name from git reference, sanitize and slugify it. If the branch name is the default branch name, replace it with 'latest'. If the head reference is not available, use the git reference as branch name, for instance, the tag.
+        description: Version name extracted, sanitized and slugified (e.g. 'main', 'develop', '1.2.3').
         value: ${{ jobs.extract-version.outputs.result }}
 
 permissions:

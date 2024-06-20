@@ -4,12 +4,12 @@ on:
   workflow_call:
     inputs:
       test_run:
-        description: "Run tests after build"
+        description: Run tests after build.
         required: false
         default: true
         type: boolean
       test_command:
-        description: "Test command to run after build (e.g. 'test' or 'ci')"
+        description: npm test command to run after build (e.g. 'test', 'test:unit').
         required: false
         default: "test"
         type: string

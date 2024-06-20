@@ -4,38 +4,38 @@ on:
   workflow_call:
     inputs:
       registry_url:
-        description: "Registry where the image is stored (e.g. registry-1.docker.io)"
+        description: Registry where the image is stored (e.g. registry-1.docker.io).
         required: false
         type: string
-        default: "registry-1.docker.io"
+        default: registry-1.docker.io
       registry_username:
-        description: "Registry username"
+        description: Registry username.
         required: true
         type: string
       environment:
-        description: "Environment to deploy (e.g. staging, production)"
+        description: GitHub repository environment to deploy to (e.g. 'production', 'staging').
         required: true
         type: string
       namespace_name:
-        description: "Namespace to deploy (e.g. my-namespace, default)"
+        description: Namespace to deploy to (e.g. 'default', 'my-namespace').
         required: true
         type: string
       deployment_name:
-        description: "Deployment to deploy (e.g. my-deployment)"
+        description: Deployment to deploy (e.g. 'my-deployment').
         required: true
         type: string
       image_name:
-        description: "Image to deploy (e.g. my-image)"
+        description: Image to deploy (e.g. 'my-image').
         required: true
         type: string
       image_tag:
-        description: "Tag to deploy (e.g. latest, 1.0.0)"
+        description: Tag to deploy (e.g. 'latest', '1.2.3').
         required: false
         default: latest
         type: string
     secrets:
       kubeconfig:
-        description: "Kubeconfig to use, base64 encoded"
+        description: Kubeconfig to use, base64 encoded.
         required: true
 
 jobs:

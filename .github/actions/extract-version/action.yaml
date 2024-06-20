@@ -1,9 +1,9 @@
 name: 📄 Extract version
-description: Extract version name from git reference, sanitize and slugify it. If the branch name is the default branch name, replace it with 'latest'. If the head reference is not available, use the git reference as branch name, for instance, the tag.
+description: Extract version name from git reference, sanitize and slugify it. If the branch name is the default branch name, replace it with 'latest'. If the head reference is not available, use the git reference as branch name (e.g. 'main', 'develop'), for instance, the tag (e.g. '1.2.3').
 
 outputs:
   result:
-    description: Version name extracted, sanitized and slugified
+    description: Version name extracted, sanitized and slugified.
     value: ${{ steps.extract-version.outputs.result }}
 
 runs:
