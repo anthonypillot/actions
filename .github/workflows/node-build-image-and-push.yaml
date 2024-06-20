@@ -25,6 +25,11 @@ on:
         required: false
         default: "latest"
         type: string
+      dockerfile:
+        description: Path to the Dockerfile.
+        required: false
+        default: "Dockerfile"
+        type: string
       platforms:
         description: Platforms to build for.
         required: false
@@ -77,6 +82,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ${{ inputs.dockerfile }}
           push: true
           platforms: ${{ inputs.platforms }}
           tags: |
