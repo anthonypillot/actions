@@ -89,3 +89,5 @@ jobs:
             ${{ inputs.registry_url }}/${{ inputs.image_owner }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
             ${{ inputs.registry_url }}/${{ inputs.image_owner }}/${{ inputs.image_name }}:latest
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
