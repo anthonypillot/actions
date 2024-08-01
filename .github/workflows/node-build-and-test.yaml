@@ -3,12 +3,12 @@ name: 🏗️ Build
 on:
   workflow_call:
     inputs:
-      test_run:
+      run_test:
         type: boolean
         description: Run tests after build.
         required: false
-        default: true
-      test_command:
+        default: false
+      run_test_command:
         type: string
         description: npm test command to run after build (e.g. 'test', 'test:unit').
         required: false
@@ -44,5 +44,5 @@ jobs:
         run: npm run build
 
       - name: 🧪 Run tests
-        if: ${{ inputs.test_run }}
-        run: npm run ${{ inputs.test_command }}
+        if: ${{ inputs.run_test }}
+        run: npm run ${{ inputs.run_test_command }}
