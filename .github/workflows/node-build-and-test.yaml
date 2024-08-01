@@ -13,6 +13,16 @@ on:
         description: npm test command to run after build (e.g. 'test', 'test:unit').
         required: false
         default: "test"
+      run_lint:
+        type: boolean
+        description: Run linting before build.
+        required: false
+        default: false
+      run_lint_command:
+        type: string
+        description: npm lint command to run before build (e.g. 'lint', 'lint:js').
+        required: false
+        default: "lint"
 
 permissions:
   contents: read
@@ -39,6 +49,10 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm ci
+
+      - name: 🧹 Lint code
+        if: ${{ inputs.run_lint }}
+        run: npm run ${{ inputs.run_lint_command }}
 
       - name: 🏗️ Build application
         run: npm run build
