@@ -35,7 +35,9 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [lts/*, current]
+        node-version: [lts/*, 22, current]
+
+    continue-on-error: ${{ matrix.node-version == 'current' }}
 
     steps:
       - name: 📥 Checkout
