@@ -29,15 +29,13 @@ permissions:
 
 jobs:
   build:
-    name: Build
+    name: Build with Node.js
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [lts/*, 22, current]
-
-    continue-on-error: ${{ matrix.node-version == 'current' }}
+        node-version: [20, 22]
 
     steps:
       - name: 📥 Checkout
