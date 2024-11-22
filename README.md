@@ -21,11 +21,11 @@ git tag -d v1 && git tag v1 && git push origin --force --tags
 
 ## Composite actions
 
-- [`extract-branch-name`](.github/actions/extract-branch-name/action.yaml) extract branch name from git reference, sanitize and slugify it.
+- [`extract-version`](.github/actions/extract-version/action.yaml) extract branch name from git reference, sanitize and slugify it.
 
 ## Reusable workflows
 
-- [`extract-branch-name`](.github/workflows/extract-branch-name.yaml) extract branch name from git reference, sanitize and slugify it.
+- [`extract-version`](.github/workflows/extract-version.yaml) extract branch name from git reference, sanitize and slugify it.
 
 ## **Node.js** reusable workflows
 
