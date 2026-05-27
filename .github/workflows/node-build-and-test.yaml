@@ -3,6 +3,11 @@ name: 🏗️ Build
 on:
   workflow_call:
     inputs:
+      node_version:
+        type: string
+        description: Node.js version(s) to build with. Use JSON array format, e.g., '["20"]' or '["18", "20", "22"]'. Defaults to '["lts/*", "current"]'.
+        required: false
+        default: '["lts/*", "current"]'
       run_test:
         type: boolean
         description: Run tests after build.
@@ -35,7 +40,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22, 24]
+        node-version: ${{ fromJSON(inputs.node_version) }}
 
     steps:
       - name: 📥 Checkout
