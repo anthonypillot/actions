@@ -65,23 +65,23 @@ jobs:
         run: kubectl get deployments -n ${{ inputs.namespace_name }} ${{ inputs.deployment_name }} -o=wide
 
       - name: 🚀 Set image tag to [${{ inputs.image_tag }}]
-        id: set_image
+        env:
+          CONTAINER_NAME: ${{ inputs.container_name || inputs.deployment_name }}
+          DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
+          IMAGE: ${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
+          NAMESPACE_NAME: ${{ inputs.namespace_name }}
         run: |
-          echo image_updated=$(kubectl set image -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} ${{ inputs.container_name || inputs.deployment_name }}=${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ inputs.image_name }}:${{ inputs.image_tag }}) >> $GITHUB_OUTPUT
+          current_image=$(kubectl get deployment "$DEPLOYMENT_NAME" \
+            --namespace "$NAMESPACE_NAME" \
+            --output "jsonpath={.spec.template.spec.containers[?(@.name=='$CONTAINER_NAME')].image}")
 
-      - name: 🔊 Display "set_image" step output
-        if: steps.set_image.outputs.image_updated != '' # if the image hasn't been updated, the output will be empty
-        run: echo ${{ steps.set_image.outputs.image_updated }}
-
-      # Rollout the deployment only if the image hasn't been updated, to avoid unnecessary restarts and to pull the new image.
-      - name: 🚀 Rollout deployment [${{ inputs.deployment_name }}]
-        id: rollout
-        if: steps.set_image.outputs.image_updated == '' # if the image hasn't been updated, the output will be empty
-        run: echo deployment_rollout=$(kubectl rollout -n ${{ inputs.namespace_name }} restart deployment ${{ inputs.deployment_name }}) >> $GITHUB_OUTPUT
-
-      - name: 🔊 Display "rollout" step output
-        if: steps.rollout.outputs.deployment_rollout
-        run: echo ${{ steps.rollout.outputs.deployment_rollout }}
+          if [[ "$current_image" == "$IMAGE" ]]; then
+            kubectl rollout restart deployment "$DEPLOYMENT_NAME" --namespace "$NAMESPACE_NAME"
+          else
+            kubectl set image deployment/"$DEPLOYMENT_NAME" \
+              "$CONTAINER_NAME=$IMAGE" \
+              --namespace "$NAMESPACE_NAME"
+          fi
 
       - name: 🔄 Rollout status
         run: kubectl rollout status -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} --timeout=5m
