@@ -24,6 +24,11 @@ on:
         type: string
         description: Deployment to deploy (e.g. 'my-deployment').
         required: true
+      container_name:
+        type: string
+        description: Container to update. Defaults to the deployment name.
+        required: false
+        default: ""
       image_name:
         type: string
         description: Image to deploy (e.g. 'my-image').
@@ -62,7 +67,7 @@ jobs:
       - name: 🚀 Set image tag to [${{ inputs.image_tag }}]
         id: set_image
         run: |
-          echo image_updated=$(kubectl set image -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} ${{ inputs.deployment_name }}=${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ inputs.image_name }}:${{ inputs.image_tag }}) >> $GITHUB_OUTPUT
+          echo image_updated=$(kubectl set image -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} ${{ inputs.container_name || inputs.deployment_name }}=${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ inputs.image_name }}:${{ inputs.image_tag }}) >> $GITHUB_OUTPUT
 
       - name: 🔊 Display "set_image" step output
         if: steps.set_image.outputs.image_updated != '' # if the image hasn't been updated, the output will be empty
@@ -79,7 +84,7 @@ jobs:
         run: echo ${{ steps.rollout.outputs.deployment_rollout }}
 
       - name: 🔄 Rollout status
-        run: kubectl rollout status -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} --timeout=120s
+        run: kubectl rollout status -n ${{ inputs.namespace_name }} deployment/${{ inputs.deployment_name }} --timeout=5m
 
       - name: 🔊 Display deployment state after update
         run: kubectl get deployments -n ${{ inputs.namespace_name }} ${{ inputs.deployment_name }} -o=wide
