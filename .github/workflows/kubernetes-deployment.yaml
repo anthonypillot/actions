@@ -48,7 +48,9 @@ jobs:
     name: Version [${{ inputs.image_tag }}] on [${{ inputs.environment }}]
     runs-on: ubuntu-latest
 
-    concurrency: ${{ inputs.environment }} # refer to https://docs.github.com/en/actions/using-jobs/using-concurrency
+    concurrency:
+      group: ${{ inputs.environment }}-${{ inputs.namespace_name }}-${{ inputs.deployment_name }}
+      cancel-in-progress: false
     environment:
       name: ${{ inputs.environment }} # refer to your GitHub repository environment
 
