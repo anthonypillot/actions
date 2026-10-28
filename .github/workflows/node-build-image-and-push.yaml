@@ -80,6 +80,7 @@ jobs:
 
       - name: 🐳 Build and push image
         uses: docker/build-push-action@v7
+        timeout-minutes: 20
         with:
           context: .
           file: ${{ inputs.dockerfile }}
